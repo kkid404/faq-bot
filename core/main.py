@@ -1,8 +1,16 @@
-from fastapi import FastAPI
+# core/main.py
+
 import os
+
 import psycopg2
+from fastapi import FastAPI
+
+from api_demo import router as demo_router
 
 app = FastAPI()
+
+app.include_router(demo_router)
+
 
 @app.get("/health")
 def health():
@@ -12,6 +20,9 @@ def health():
 @app.get("/db-health")
 def db_health():
     db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        return {"db_status": "error", "detail": "DATABASE_URL is not set"}
+
     try:
         conn = psycopg2.connect(db_url)
         conn.close()
