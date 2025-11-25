@@ -6,6 +6,8 @@ import DemoChat from './components/DemoChat';
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [contactHandle, setContactHandle] = useState('');
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
@@ -17,6 +19,22 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  function handleLeadSubmit(e) {
+    e.preventDefault();
+    const value = contactHandle.trim();
+    if (!value) return;
+
+    setIsSubmittingLead(true);
+    try {
+      // TODO: отправить данные на бекенд, когда появится endpoint
+      console.log('Lead from landing:', value);
+      alert('Спасибо! Я свяжусь с вами, когда пилот будет расширяться.');
+      setContactHandle('');
+    } finally {
+      setIsSubmittingLead(false);
+    }
+  }
 
   return (
     <div className="page-wrapper">
@@ -50,15 +68,29 @@ export default function Home() {
               </p>
               
               <div className="cta-wrapper">
-                <a href="#demo-chat" className="cta-button primary">
+                <button
+                  className="cta-button primary"
+                  onClick={() => {
+                    const demo = document.getElementById('demo-chat');
+                    if (demo) {
+                      demo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                >
                   <span className="button-text">Посмотреть в деле</span>
                   <svg className="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
-                </a>
-                <button className="cta-button secondary" onClick={() => {
-                  alert('Предположительно здесь будет форма регистрации');
-                }}>
+                </button>
+                <button
+                  className="cta-button secondary"
+                  onClick={() => {
+                    const lead = document.getElementById('lead-capture');
+                    if (lead) {
+                      lead.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                >
                   Начать бесплатно
                 </button>
               </div>
@@ -274,11 +306,47 @@ export default function Home() {
 
           <div className="demo-cta">
             <p className="demo-cta-text">Понравилось? Запустите для своего бизнеса.</p>
-            <button className="cta-button primary" onClick={() => {
-              alert('Предположительно здесь будет форма регистрации');
-            }}>
+            <button
+              className="cta-button primary"
+              onClick={() => {
+                const el = document.getElementById('lead-capture');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }}
+            >
               Начать бесплатный пробный период
             </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="lead-capture-section" id="lead-capture">
+        <div className="container">
+          <div className="lead-capture-card">
+            <div className="lead-capture-text">
+              <h2>Хотите в пилот?</h2>
+              <p>
+                Оставьте ссылку на ваш Telegram или VK. Я напишу вам, когда буду
+                набирать следующих участников.
+              </p>
+            </div>
+            <form className="lead-capture-form" onSubmit={handleLeadSubmit}>
+              <input
+                type="text"
+                className="lead-capture-input"
+                placeholder="@username в TG или VK"
+                value={contactHandle}
+                onChange={(e) => setContactHandle(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="cta-button primary lead-capture-button"
+                disabled={isSubmittingLead}
+              >
+                Хочу в пилот
+              </button>
+            </form>
           </div>
         </div>
       </div>
