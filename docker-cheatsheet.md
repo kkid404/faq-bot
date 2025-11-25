@@ -106,3 +106,33 @@ docker system prune
 ```
 
 > Обычно достаточно `docker-compose up/down`. Остальные команды нужны реже — когда хочется посмотреть, что именно запущено или почистить старое.
+
+## Dev Docker Compose (режим разработки)
+
+### Запуск dev-окружения (если есть `docker-compose.dev.yml`)
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
+
+- Использует базовый `docker-compose.yml` + dev-оверрайд `docker-compose.dev.yml`.
+- Запускает сервисы в фоне и пересобирает образы при изменениях.
+
+### Быстрый запуск dev без пересборки
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+```
+
+- Удобно, когда код меняется, но Dockerfile и зависимости те же.
+
+### Перезапуск только core в dev
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml restart core
+```
+
+### Логи core в dev-compose
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f core
