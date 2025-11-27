@@ -3,6 +3,8 @@
 
 import { useState, useEffect, useRef } from "react";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+
 function generateSessionId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
@@ -37,7 +39,7 @@ export default function DemoChat() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/demo/message", {
+      const res = await fetch(`${API_BASE}/demo/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId, text }),

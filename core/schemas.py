@@ -8,3 +8,7 @@ class DemoMessageRequest(BaseModel):
 
 class DemoMessageResponse(BaseModel):
     reply_text: str
+
+
+class LandingLead(BaseModel):
+    contact: str

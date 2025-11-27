@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react';
 import DemoChat from './components/DemoChat';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [contactHandle, setContactHandle] = useState('');
   const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+  const [leadStatus, setLeadStatus] = useState(null);
 
   useEffect(() => {
     setIsVisible(true);
@@ -26,14 +29,31 @@ export default function Home() {
     if (!value) return;
 
     setIsSubmittingLead(true);
-    try {
-      // TODO: отправить данные на бекенд, когда появится endpoint
-      console.log('Lead from landing:', value);
-      alert('Спасибо! Я свяжусь с вами, когда пилот будет расширяться.');
-      setContactHandle('');
-    } finally {
-      setIsSubmittingLead(false);
-    }
+    setLeadStatus(null);
+    fetch(`${API_BASE}/landing/lead`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contact: value }),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          const detail = data && data.detail ? data.detail : `HTTP ${res.status}`;
+          throw new Error(detail);
+        }
+        return res.json();
+      })
+      .then(() => {
+        setLeadStatus({ type: 'success', message: 'Заявка отправлена. Я напишу вам в Telegram или VK.' });
+        setContactHandle('');
+      })
+      .catch((err) => {
+        console.error('Lead submit error', err);
+        setLeadStatus({ type: 'error', message: 'Не удалось отправить заявку. Попробуйте ещё раз позже.' });
+      })
+      .finally(() => {
+        setIsSubmittingLead(false);
+      });
   }
 
   return (
