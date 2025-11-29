@@ -29,8 +29,7 @@ export default function DemoChat() {
     }
   }, [messages, isLoading]);
 
-  async function sendMessage(e) {
-    e.preventDefault();
+  async function sendMessage() {
     const text = input.trim();
     if (!text) return;
 
@@ -88,14 +87,31 @@ export default function DemoChat() {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={sendMessage} className="demo-chat-input-row">
-        <input
-          type="text"
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!isLoading) {
+            void sendMessage();
+          }
+        }}
+        className="demo-chat-input-row"
+      >
+        <textarea
           placeholder="Напишите вопрос..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              if (!isLoading) {
+                void sendMessage();
+              }
+            }
+          }}
           className="demo-chat-input"
+          rows={2}
         />
+
         <button
           type="submit"
           disabled={isLoading}
